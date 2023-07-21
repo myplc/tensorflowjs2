@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  </head>
+  <body>
+    <input type="file" onchange="readExcel()" />
+    <button>분석시작</button>
+    <script>
+      let house = [];
+      let medv = [];
+      const readExcel = () => {
+        const input = this.event.target;
+        const reader = new FileReader();
+        reader.onload = function () {
+          const data = reader.result;
+          const workBook = XLSX.read(data, { type: "binary" });
+          const x = workBook.Sheets.Data;
+          //   console.log(x.A2.v);
+          const dataArr = [],
+            targetArr = [];
+          for (let i = 2; i < 508; i++) {
+            for (let j = 65; j < 78; j++) {
+              // A부터 M까지만 순회 N값은 결과값이라 제외
+              let str = String.fromCharCode(j) + i; // A(아스키코드로65) + 2 즉 'A2'가 됨
+              dataArr.push(x[str].v);
+            }
+            targetArr.push(x["N" + i].v);
+          }
+          console.log(dataArr, targetArr);
+        };
+        reader.readAsBinaryString(input.files[0]);
+      };
+    </script>
+  </body>
+</html>
