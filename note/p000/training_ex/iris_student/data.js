@@ -23,11 +23,10 @@ export const IRIS_CLASSES = [
 export const IRIS_NUM_CLASSES = IRIS_CLASSES.length;
 
 /* 다음 아이리스 데이터를 넣으시오. */
-const IRIS_DATA = [
-  // 꽃잎 길이, 꽃잎 너비, 꽃받침 길이, 꽃받침 너비, 클래스(0~2)
-  [5.1, 3.5, 1.4, 0.2, 0],
-  //... 등등...
-];
+const IRIS_DATA = "./IRIS.csv";
+// 꽃잎 길이, 꽃잎 너비, 꽃받침 길이, 꽃받침 너비, 클래스(0~2)
+// [5.1, 3.5, 1.4, 0.2, 0],
+//... 등등...
 
 function convertToTensors(data, targets, testSplit) {
   const numExamples = data.length;
