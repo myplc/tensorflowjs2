@@ -1,5 +1,12 @@
 {
   "dependencies": {
-    "cors": "^2.8.5"
-  }
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "name": "tensorflowjs2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/myplc/tensorflowjs2.git",
+  "author": "myplc <plctohmi@gmail.com>",
+  "license": "MIT"
 }
