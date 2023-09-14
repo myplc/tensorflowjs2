@@ -1,0 +1,13 @@
+{
+  "name": "cjs_esm",
+  "version": "1.0.0",
+  "description": "cjs and ems test",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0"
+  },
+  "type": "module"
+}
