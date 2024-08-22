@@ -1,0 +1,23 @@
+{
+  "folders": [
+	{
+		"name": "mevn",
+		"path": "../../mevn"
+	},
+	{
+		"name": "my_ready",
+		"path": "../../my_ready"
+	},
+	{
+		"name": "tensorflowjs2",
+		"path": ".."
+	},
+	{
+		"name": "my_tensorflowjs",
+		"path": "../../my_tensorflowjs"
+	}
+],
+  "settings": {
+    "liveServer.settings.multiRootWorkspaceName": "my_ready"
+  }
+}
