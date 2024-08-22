@@ -15,6 +15,9 @@
 	{
 		"name": "my_tensorflowjs",
 		"path": "../../my_tensorflowjs"
+	},
+	{
+		"path": "../../shy01"
 	}
 ],
   "settings": {
