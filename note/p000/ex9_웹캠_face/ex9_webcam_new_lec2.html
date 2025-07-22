@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>얼굴 감정/나이/성별 분석</title>
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+</head>
+
+<body>
+    <h3>얼굴 감지 및 감정·나이·성별 분석</h3>
+    <video id="video" width="360" height="270" autoplay muted playsinline></video>
+    <canvas id="canvas" width="360" height="270"></canvas>
+    <div id="result"></div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const resultDiv = document.getElementById('result');
+
+        // 1. 모델 로드
+        async function loadModels() {
+            const url = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+            await Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri(url),
+                faceapi.nets.faceExpressionNet.loadFromUri(url),
+                faceapi.nets.ageGenderNet.loadFromUri(url),
+                faceapi.nets.faceLandmark68Net.loadFromUri(url)
+            ]);
+        }
+
+        // 2. 웹캠 시작
+        async function startCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({video: {width: 360, height: 270}});
+            video.srcObject = stream;
+            video.style.display = "none"; // 원본끄기
+            return new Promise(resolve => {
+                video.onloadedmetadata = () => {
+                    video.play();
+                };
+                // canplay 이벤트로 안전하게 시작
+                video.oncanplay = () => resolve();
+            });
+        }
+
+        // 3. 얼굴 분석
+        async function analyzeFace() {
+            if (video.readyState === 4) { // 재생 가능 상태만 draw
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                const detections = await faceapi.detectAllFaces(
+                    canvas, // canvas에 그려진 이미지에서 얼굴 분석
+                    new faceapi.TinyFaceDetectorOptions()
+                )
+                    .withFaceLandmarks()
+                    .withFaceExpressions()
+                    .withAgeAndGender();
+
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                resultDiv.innerHTML = "";
+
+                detections.forEach(detect => {
+                    const {x, y, width, height} = detect.detection.box;
+                    ctx.strokeStyle = "red";
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x, y, width, height);
+
+                    const expr = detect.expressions;
+                    const maxExpr = Object.keys(expr).reduce((a, b) => expr[a] > expr[b] ? a : b);
+                    const age = detect.age.toFixed(1);
+                    const gender = detect.gender;
+                    ctx.font = "14px Arial";
+                    ctx.fillStyle = "yellow";
+                    ctx.fillText(`감정: ${maxExpr}`, x, y - 30);
+                    ctx.fillText(`나이: ${age}세`, x, y - 15);
+                    ctx.fillText(`성별: ${gender === "male" ? "남자" : "여자"}`, x, y);
+
+                    resultDiv.innerHTML += `
+            <div>
+              <b>감정:</b> ${maxExpr} /
+              <b>나이:</b> ${age} /
+              <b>성별:</b> ${gender}
+            </div>
+          `;
+                });
+            }
+            setTimeout(analyzeFace, 100);
+        }
+
+        // 4. 전체 실행
+        async function run() {
+            await loadModels();
+            await startCamera();
+            analyzeFace();
+        }
+        run();
+    </script>
+</body>
+
+</html>

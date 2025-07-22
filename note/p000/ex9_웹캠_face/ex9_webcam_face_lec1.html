@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlazeFace 얼굴 인식 개선</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
+  <style>
+    #display {
+      position: relative;
+    }
+
+    canvas,
+    video {
+      position: absolute;
+    }
+  </style>
+</head>
+
+<body>
+  <h2 id="msg">로딩중..</h2>
+  <div id="display"></div>
+  <script>
+    const display = document.getElementById("display");
+    const video = document.createElement("video");
+    const msg = document.getElementById("msg");
+    display.appendChild(video);
+    video.width = 600;
+    video.height = 500;
+
+    // ** canvas는 미리 1개만 생성해서 재사용 **
+    const canvas = document.createElement("canvas");
+    canvas.width = video.width;
+    canvas.height = video.height;
+    display.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+
+    let cam, blaze;
+
+    // 1. 모델 및 웹캠 1회만 로드
+    async function setup() {
+      cam = await tf.data.webcam(video);
+      blaze = await blazeface.load();
+      msg.innerHTML = "얼굴 인식 준비완료!";
+    }
+
+    // 2. 얼굴 인식 및 박스 그리기
+    async function scan() {
+      const img = await cam.capture();
+      const predictions = await blaze.estimateFaces(img);
+
+      // 인원수 표시
+      msg.innerHTML = `측정인원수: ${predictions.length}명`;
+
+      // 캔버스 초기화
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 얼굴 사각형 그리기
+      predictions.forEach(pred => {
+        const [x, y] = pred.topLeft;
+        const [x2, y2] = pred.bottomRight;
+        const w = x2 - x, h = y2 - y;
+        ctx.strokeStyle = "cornflowerblue";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, w, h);
+      });
+
+      tf.dispose(img);
+    }
+
+    // 3. 전체 흐름
+    (async () => {
+      await setup();
+      setInterval(scan, 500);
+    })();
+  </script>
+</body>
+
+</html>

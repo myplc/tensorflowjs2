@@ -14,7 +14,6 @@
 <body>
   <div id="display"></div>
   <button id="pick">스캔시작</button>
-  <button id="stop">정지</button>
   <h2>
     <div id="result"></div>
   </h2>
@@ -22,7 +21,6 @@
     const video = document.createElement("video");
     const display = document.getElementById("display");
     const pick = document.getElementById("pick");
-    const stop = document.getElementById("stop");
     const res = document.getElementById("result");
     display.appendChild(video);
     video.width = 500;
@@ -48,10 +46,7 @@
       stat = setInterval(main, 3000);
       console.log(stat);
     });
-    stop.addEventListener("click", () => {
-      clearInterval(stat);
-      console.log("정지", stat);
-    });
+
   </script>
 </body>
 

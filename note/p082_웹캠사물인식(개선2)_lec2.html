@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mobilenet 실시간 웹캠 분류 개선</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+</head>
+
+<body>
+    <div id="display"></div>
+    <button id="pick">스캔시작</button>
+    <button id="stop">정지</button>
+    <h2>
+        <div id="result"></div>
+    </h2>
+    <script>
+        const video = document.createElement("video");
+        const display = document.getElementById("display");
+        const pick = document.getElementById("pick");
+        const stop = document.getElementById("stop");
+        const res = document.getElementById("result");
+        display.appendChild(video);
+        video.width = 500;
+        video.height = 500;
+
+        let cam, net, stat;
+
+        // 모델과 웹캠을 한 번만 로딩
+        async function setup() {
+            cam = await tf.data.webcam(video);
+            net = await mobilenet.load();
+            res.innerHTML = "모델 준비 완료!";
+        }
+
+        // 한 프레임 캡처 및 분류 함수
+        async function classifyFrame() {
+            const img = await cam.capture();
+            const result = await net.classify(img);
+
+            res.innerHTML =
+                "스캔중입니다...<hr>" +
+                result.map(
+                    r =>
+                        `${r.className} : ${(r.probability * 100).toFixed(2)}%`
+                ).join("<br>");
+            tf.dispose(img);
+        }
+
+        // 실습 흐름 제어
+        pick.addEventListener("click", async () => {
+            if (!net || !cam) await setup(); // 처음만 로딩
+            stat = setInterval(classifyFrame, 1000);
+            console.log("스캔 시작", stat);
+        });
+        stop.addEventListener("click", () => {
+            clearInterval(stat);
+            res.innerHTML = "정지됨";
+            console.log("정지", stat);
+        });
+    </script>
+</body>
+
+</html>

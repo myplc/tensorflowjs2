@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>모바일넷 분류 실습</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+</head>
+
+<body>
+  <div id="display"></div>
+  <button id="pick">스캔시작</button>
+  <h2>
+    <div id="result"></div>
+  </h2>
+  <script>
+    const video = document.createElement("video");
+    document.getElementById("display").appendChild(video);
+    video.width = 500;
+    video.height = 500;
+
+    document.getElementById("pick").onclick = async () => {
+      const cam = await tf.data.webcam(video);
+      const img = await cam.capture();
+      const net = await mobilenet.load();
+      const result = await net.classify(img);
+      document.getElementById("result").innerHTML =
+        result[0].className + "<br>" + (result[0].probability * 100).toFixed(2) + "%";
+      tf.dispose(img);
+    };
+  </script>
+</body>
+
+</html>
