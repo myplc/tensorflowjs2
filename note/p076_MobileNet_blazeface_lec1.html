@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
+</head>
+
+<body>
+  <h1>웹캠 얼굴</h1>
+  <video src="" width="500" height="500"></video>
+  <hr>
+  <button id="btn1" onclick="main()">스캔시작</button>
+  <button id="btn2" onclick="face()">얼굴인식시작</button>
+  <p id="predictions">인식중...</p>
+  <script>
+    const video = document.querySelector("video");
+    const main = async () => {
+      const cam = await tf.data.webcam(video);
+      const img = await cam.capture();
+      const model = await mobilenet.load()
+      const predictions = await model.classify(img)
+      const pp = document.getElementById("predictions");
+      console.log(predictions);
+      pp.innerHTML =
+        predictions[0].className +
+        "<br>" +
+        (predictions[0].probability * 100).toFixed(2) +
+        "%";
+    };
+    const face = async () => {
+      const cam = await tf.data.webcam(video);
+      const img = await cam.capture();
+      blaze = await blazeface.load();
+      const predictions = await blaze.estimateFaces(img);
+      console.log(predictions)
+
+    }
+  </script>
+  <script>
+    // 출력: 얼굴이 감지된 경우, 각 얼굴에 대해 다음 정보를 포함한 배열 반환
+    // topLeft: 얼굴 영역의 좌상단 좌표
+    // bottomRight: 얼굴 영역의 우하단 좌표
+    // landmarks: 눈, 코, 입, 귀 등 6개의 얼굴 특징점 좌표
+    // probability: 얼굴일 확률 (0~1 사이 값)
+  </script>
+</body>
+
+</html>
