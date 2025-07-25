@@ -9,18 +9,18 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
   <style>
-    canvas,
-    video {
-      position: absolute;
+    #display {
+      float: left;
     }
   </style>
 </head>
 
+
 <body>
   <h1>웹캠 얼굴</h1>
   <hr>
-  <button id="btn1" onclick="main()">스캔시작</button>
   <button id="btn2" onclick="face()">얼굴인식시작</button>
+  <button id="shot" onclick="shot()">찰칵</button>
   <p id="predictions">버튼을 누르세요.</p>
   <hr>
   <div id="display">
@@ -29,42 +29,26 @@
   </div>
   <script>
     const video = document.querySelector("video");
-    const pp = document.getElementById("predictions");
     const canvas = document.querySelector("canvas");
-    const ctx = canvas.getContext("2d");
-    const main = async () => {
-      const cam = await tf.data.webcam(video);
-      const img = await cam.capture();
-      const model = await mobilenet.load()
-      const predictions = await model.classify(img)
-      console.log(predictions);
-      pp.innerHTML =
-        predictions[0].className +
-        "<br>" +
-        (predictions[0].probability * 100).toFixed(2) +
-        "%";
-    };
     const face = async () => {
       const cam = await tf.data.webcam(video);
       const img = await cam.capture();
+      console.log(img)
       blaze = await blazeface.load();
       const predictions = await blaze.estimateFaces(img);
       console.log(predictions)
-      // 인원수 표시
-      pp.innerHTML = `측정인원수: ${predictions.length}명`;
-      // 캔버스 초기화
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // 얼굴 사각형 그리기
-      predictions.forEach(pred => {
-        const [x, y] = pred.topLeft;
-        const [x2, y2] = pred.bottomRight;
-        const w = x2 - x, h = y2 - y;
-        ctx.strokeStyle = "cornflowerblue";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x, y, w, h);
-      });
       tf.dispose(img);
+    }
+    const shot = async () => {
+      const cam = await tf.data.webcam(video);
+      const img = await cam.capture();
+      await tf.browser.toPixels(img, canvas);
+      // 1) 1차원 배열로 모든 값 반환 (비동기)
+      // const flatData = await img.data();
+      // console.log(flatData);
+      // 2) 다차원 배열로 변환 (비동기)
+      const arr = await img.array();
+      console.log(arr);
     }
   </script>
   <script>

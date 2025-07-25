@@ -12,11 +12,15 @@
 
 <body>
   <h1>웹캠 얼굴</h1>
-  <video src="" width="500" height="500"></video>
   <hr>
   <button id="btn1" onclick="main()">스캔시작</button>
   <button id="btn2" onclick="face()">얼굴인식시작</button>
-  <p id="predictions">인식중...</p>
+  <p id="predictions">버튼을 누르세요.</p>
+  <hr>
+  <div id="display">
+    <video src="" width="500" height="500"></video>
+    <canvas width="500" height="500"></canvas>
+  </div>
   <script>
     const video = document.querySelector("video");
     const main = async () => {
@@ -35,10 +39,17 @@
     const face = async () => {
       const cam = await tf.data.webcam(video);
       const img = await cam.capture();
-      blaze = await blazeface.load();
+      console.log(img)
+      // 1) 1차원 배열로 모든 값 반환 (비동기)
+      // const flatData = await img.data();
+      // console.log(flatData);
+      // 2) 다차원 배열로 변환 (비동기)
+      // const arr = await img.array();
+      // console.log(arr);
+      // blaze = await blazeface.load();
       const predictions = await blaze.estimateFaces(img);
       console.log(predictions)
-
+      tf.dispose(img);
     }
   </script>
   <script>
